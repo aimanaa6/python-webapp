@@ -83,5 +83,18 @@ def test_joke_count():
         assert b"Number of jokes" in response.data
         assert b"21" in response.data
 
+def test_register_page():
+    """
+    testing /register page functionality
+    """
+    with app.test_client() as test_client:
+        response = test_client.get("/register")
+        assert response.status_code == 201
 
-
+def test_login():
+    """
+    testing /login page
+    """
+    with app.test_client() as test_client:
+        response = test_client.get("/login")
+        assert response.status_code == 201
