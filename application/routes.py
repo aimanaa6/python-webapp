@@ -66,7 +66,7 @@ def login():
             query = f"select id, hashed_password from users where username = '{name}'"
             user_id, db_hashed_password = db.query(query)[0]
             if not db_hashed_password or not check_password_hash(db_hashed_password, password):
-                return jsonify({'message': 'Invalid email or password'}), 401
+                return render_template('login.html', title='Login', error='Invalid email or password', )
 
             access_token = create_access_token(identity=str(user_id))
             response = make_response(redirect(url_for('joke')))
