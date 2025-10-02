@@ -28,15 +28,19 @@ def welcome(name='Team'):
 
 @app.route('/joke')
 def joke():
+    # token remains active in joke page
     token = request.cookies.get('jwt_token')
+    # if there is no token user gets redirected to login page
     if not token:
         return make_response(redirect(url_for('login')))
 
     db = DataAccess()
+    # class DataAccess executes SQL query
     jokes = db.query("SELECT * from joke;")
     joke_number = random.randrange(len(jokes))
     joke_question = jokes[joke_number][1]
     joke_answer = jokes[joke_number][2]
+    # parameters passed through render template generate jokes from database
     return render_template('joke.html', title="Joke Time", joke_question=joke_question, joke_answer=joke_answer, number_of_jokes=len(jokes))
 
 
@@ -62,18 +66,26 @@ def register():
 @app.route('/login', methods=['GET','POST'])
 def login():
     if request.method == 'POST':
+        # post method data is being updated - get only retrieves the form
+        # grabbing username and password
         name = request.form.get('username')
         password = request.form.get('password')
         try:
+            # data access class connects to my SQL
             db = DataAccess()
             query = f"select id, hashed_password from users where username = '{name}'"
+            # fetch username and password and takes the first result row
             user_id, db_hashed_password = db.query(query)[0]
             if not db_hashed_password or not check_password_hash(db_hashed_password, password):
                 return jsonify({'message': 'Invalid email or password'}), 401
-
+            # compares the entered password with stored hash password
+            # if there is no match returns a JSON error with 401 error
             session['loggedIn'] = True
+            # successful login - session is active in Flask
             access_token = create_access_token(identity=str(user_id))
+            # access token is generated (JWT) AND redirected to joke page (can't be accessed without user session being active)
             response = make_response(redirect(url_for('joke')))
+            # JWT token is set in browser cookie
             response.set_cookie('jwt_token', access_token)
             return response
         except Exception as error:
