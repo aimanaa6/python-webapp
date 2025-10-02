@@ -74,13 +74,10 @@ def login():
             # fetch username and password and takes the first result row
             user_id, db_hashed_password = db.query(query)[0]
             if not db_hashed_password or not check_password_hash(db_hashed_password, password):
-                return jsonify({'message': 'Invalid email or password'}), 401
+                return render_template('login.html', title='Login', error='Invalid email or password', )
             # compares the entered password with stored hash password
             # if there is no match returns a JSON error with 401 error
-            session['loggedIn'] = True
             # successful login - session is active in Flask
-                return render_template('login.html', title='Login', error='Invalid email or password', )
-
             access_token = create_access_token(identity=str(user_id))
             # access token is generated (JWT) AND redirected to joke page (can't be accessed without user session being active)
             response = make_response(redirect(url_for('joke')))
@@ -97,3 +94,4 @@ def logout():
     response = make_response(redirect(url_for('login')))
     response.delete_cookie('jwt_token')
     return response
+
