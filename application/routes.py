@@ -5,8 +5,7 @@ from flask import render_template, session, request, jsonify, url_for, redirect,
 from application import app
 from application.data_access import DataAccess
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_jwt_extended import create_access_token
-
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 
 @app.route('/')
 @app.route('/home')
@@ -23,11 +22,11 @@ def welcome(name='Team'):
 
 
 @app.route('/joke')
+@jwt_required(locations=["cookies"])
 def joke():
-    # token remains active in joke page
-    token = request.cookies.get('jwt_token')
+    user = get_jwt_identity()
     # if there is no token user gets redirected to login page
-    if not token:
+    if not user:
         return make_response(redirect(url_for('login')))
 
     db = DataAccess()
@@ -82,7 +81,7 @@ def login():
             # access token is generated (JWT) AND redirected to joke page (can't be accessed without user session being active)
             response = make_response(redirect(url_for('joke')))
             # JWT token is set in browser cookie
-            response.set_cookie('jwt_token', access_token)
+            response.set_cookie('access_token_cookie', access_token)
             return response
         except Exception as error:
             print(error)
@@ -92,6 +91,6 @@ def login():
 @app.route('/logout')
 def logout():
     response = make_response(redirect(url_for('login')))
-    response.delete_cookie('jwt_token')
+    response.delete_cookie('access_token_cookie')
     return response
 
