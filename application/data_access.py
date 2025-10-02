@@ -1,12 +1,19 @@
 import pymysql
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+print(os.getenv("DB_USER"))
+print(os.getenv("PASSWORD"))
+
 
 class DataAccess:
     def __init__(self):
         self.__conn = pymysql.connect(
-            host = "localhost",
-            user = "root",
-            password = "password",
-            db = "jokes"
+            host =  os.getenv("HOST"),
+            user = os.getenv("DB_USER"),
+            password = os.getenv("PASSWORD"),
+            db = os.getenv("DB"),
         )
         self._cur = self.__conn.cursor()
 
