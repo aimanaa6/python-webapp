@@ -5,7 +5,7 @@ class DataAccess:
         self.__conn = pymysql.connect(
             host = "localhost",
             user = "root",
-            password = "password",
+            password = "",
             db = "jokes"
         )
         self._cur = self.__conn.cursor()
