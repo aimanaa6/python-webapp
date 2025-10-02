@@ -5,16 +5,12 @@ from flask import render_template, session, request, jsonify, url_for, redirect,
 from application import app
 from application.data_access import DataAccess
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token
 
 
 @app.route('/')
 @app.route('/home')
 def home():
-    token = request.cookies.get('jwt_token')
-    if not token:
-        return make_response(redirect(url_for('login')))
-    session['loggedIn'] = False
     return render_template('home.html', title='Home')
 
 
@@ -61,7 +57,8 @@ def register():
             return redirect(url_for('login'))
         except Exception as error:
             print(error)
-    return render_template('register.html')
+            return render_template('register.html', title='Register', error=error)
+    return render_template('register.html', title='Register')
 
 @app.route('/login', methods=['GET','POST'])
 def login():
@@ -82,6 +79,8 @@ def login():
             # if there is no match returns a JSON error with 401 error
             session['loggedIn'] = True
             # successful login - session is active in Flask
+                return render_template('login.html', title='Login', error='Invalid email or password', )
+
             access_token = create_access_token(identity=str(user_id))
             # access token is generated (JWT) AND redirected to joke page (can't be accessed without user session being active)
             response = make_response(redirect(url_for('joke')))
@@ -90,4 +89,11 @@ def login():
             return response
         except Exception as error:
             print(error)
+            return render_template('login.html', title='Login', error=error)
     return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    response = make_response(redirect(url_for('login')))
+    response.delete_cookie('jwt_token')
+    return response

@@ -91,10 +91,29 @@ def test_register_page():
         response = test_client.get("/register")
         assert response.status_code == 201
 
+        # make post request to register a user
+        response = test_client.post("/register", data={"username": "John", "password": "123" })
+        assert response.status_code == 302
+
 def test_login():
     """
     testing /login page
     """
     with app.test_client() as test_client:
         response = test_client.get("/login")
-        assert response.status_code == 201
+        assert response.status_code == 200
+
+        response = test_client.post("/login", data={"username": "John", "password": "123"})
+        assert response.status_code == 302
+
+        response = test_client.post("/login", data={"username": "John", "password": "1234"})
+        assert response.status_code == 401
+
+def test_logout():
+    """
+    testing /logout page
+    """
+
+    with app.test_client() as test_client:
+        response = test_client.get("/logout")
+        assert response.status_code == 302

@@ -3,10 +3,10 @@ import pymysql
 class DataAccess:
     def __init__(self):
         self.__conn = pymysql.connect(
-            host = "localhost",
-            user = "root",
-            password = "",
-            db = "jokes"
+            host =  os.getenv("HOST"),
+            user = os.getenv("DB_USER"),
+            password = os.getenv("PASSWORD"),
+            db = os.getenv("DB"),
         )
         self._cur = self.__conn.cursor()
     # data access class with conn curser property
@@ -17,7 +17,7 @@ class DataAccess:
     def query(self, command):
         self._cur.execute(command)
         return self._cur.fetchall()
-    # fetchall grabs rows and returns them as a list of tuples
+
     def execute(self,command):
         self._cur.execute(command)
         # Get the last inserted ID
