@@ -5,7 +5,7 @@ from flask import render_template, session, request, jsonify, url_for, redirect,
 from application import app
 from application.data_access import DataAccess
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token
 
 
 @app.route('/')
@@ -14,7 +14,6 @@ def home():
     token = request.cookies.get('jwt_token')
     if not token:
         return make_response(redirect(url_for('login')))
-    session['loggedIn'] = False
     return render_template('home.html', title='Home')
 
 
@@ -57,7 +56,8 @@ def register():
             return redirect(url_for('login'))
         except Exception as error:
             print(error)
-    return render_template('register.html')
+            return render_template('register.html', title='Register', error=error)
+    return render_template('register.html', title='Register')
 
 @app.route('/login', methods=['GET','POST'])
 def login():
@@ -71,11 +71,11 @@ def login():
             if not db_hashed_password or not check_password_hash(db_hashed_password, password):
                 return jsonify({'message': 'Invalid email or password'}), 401
 
-            session['loggedIn'] = True
             access_token = create_access_token(identity=str(user_id))
             response = make_response(redirect(url_for('joke')))
             response.set_cookie('jwt_token', access_token)
             return response
         except Exception as error:
             print(error)
+            return render_template('login.html', title='Login', error=error)
     return render_template('login.html')
