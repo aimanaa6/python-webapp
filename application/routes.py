@@ -51,7 +51,7 @@ def register():
         hashed_password = generate_password_hash(request.form.get('password'))
         try:
             db = DataAccess()
-            query = f"INSERT into users(username, hashed_password) values ('{name}', '{hashed_password}')"
+            query = f"CALL add_user('{name}', '{hashed_password}')"
             db.execute(query)
 
             return redirect(url_for('login'))
