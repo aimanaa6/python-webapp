@@ -5,7 +5,7 @@ class DataAccess:
         self.__conn = pymysql.connect(
             host = "localhost",
             user = "root",
-            password = "",
+            password = "password",
             db = "jokes"
         )
         self._cur = self.__conn.cursor()
@@ -19,5 +19,8 @@ class DataAccess:
 
     def execute(self,command):
         self._cur.execute(command)
+        # Get the last inserted ID
+        inserted_id = self._cur.lastrowid
         self.__conn.commit()
+        return inserted_id
 
