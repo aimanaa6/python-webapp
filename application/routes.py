@@ -11,9 +11,6 @@ from flask_jwt_extended import create_access_token
 @app.route('/')
 @app.route('/home')
 def home():
-    token = request.cookies.get('jwt_token')
-    if not token:
-        return make_response(redirect(url_for('login')))
     return render_template('home.html', title='Home')
 
 
@@ -79,3 +76,9 @@ def login():
             print(error)
             return render_template('login.html', title='Login', error=error)
     return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    response = make_response(redirect(url_for('login')))
+    response.delete_cookie('jwt_token')
+    return response

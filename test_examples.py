@@ -108,3 +108,12 @@ def test_login():
 
         response = test_client.post("/login", data={"username": "John", "password": "1234"})
         assert response.status_code == 401
+
+def test_logout():
+    """
+    testing /logout page
+    """
+
+    with app.test_client() as test_client:
+        response = test_client.get("/logout")
+        assert response.status_code == 302
